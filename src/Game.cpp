@@ -23,6 +23,7 @@
 #include "DecisionTreeGhostController.h"
 #include "PinkyBTController.h"
 #include "PacmanBTController.h"
+#include "PinkyFSMController.h"
 
 
 extern bool quick;
@@ -35,17 +36,17 @@ gv(std::make_unique<GameView>(std::vector<std::string>{"images/maze-a.png","imag
 
 	auto pacman=std::make_shared<MsPacMan>(gameState.getMaze().getPacmanStart());
 	gameState.addPacMan(pacman);
-	//pacmanControl=std::make_shared<KeyboardController>(pacman);
+	pacmanControl=std::make_shared<KeyboardController>(pacman);
 	//pacmanControl=std::make_shared<SimplePacmanController>(pacman);
 	// pacmanControl=std::make_shared<PacmanController>(pacman);
-	pacmanControl = std::make_shared<PacmanBTController>(pacman);
+	//pacmanControl = std::make_shared<PacmanBTController>(pacman);
 	std::vector<std::shared_ptr<Ghost>> ghosts;
 	for(int i=0;i<4;i++){
 		auto ghost=std::make_shared<Ghost>(gameState.getMaze().getGhostStart()[i]);
 		ghosts.push_back(ghost);
 	}
 	gameState.addGhosts(ghosts);
-	ghostsControl.push_back(std::make_shared<DecisionTreeGhostController>(ghosts[0]));
+	ghostsControl.push_back(std::make_shared<PinkyFSMController>(ghosts[0]));
 	ghostsControl.push_back(std::make_shared<DecisionTreeGhostController>(ghosts[1]));
 	ghostsControl.push_back(std::make_shared<PinkyBTController>(ghosts[2]));
 	ghostsControl.push_back(std::make_shared<DecisionTreeGhostController>(ghosts[3]));
