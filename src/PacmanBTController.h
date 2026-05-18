@@ -19,9 +19,17 @@ public:
     const GameState* in_gamestate;
     Move out_move;
     std::shared_ptr<Character> in_character;
+    
+    // Cache de comida
+    std::vector<int> cached_food_nodes;
+    bool food_cache_valid = false;
+    
+    // Prevención de oscilaciones: compromiso temporal
+    Move committed_move = PASS;
+    int commitment_ticks = 0;
+    int last_position = -1;
 };
 
-// Controlador principal
 class PacmanBTController : public Controller {
 private:
     std::shared_ptr<Composite> root;
@@ -31,53 +39,67 @@ public:
     virtual Move getMove(const GameState& gs) override;
 };
 
-// Nodo condición: ¿hay fantasmas comestibles cerca?
-class NearbyEdibleGhost : public Behavior {
+// === CONDICIONES ===
+
+// ¿Vale la pena perseguir fantasma comestible? (más cerca que comida)
+class WorthChasingGhost : public Behavior {
 public:
     virtual Status update() override;
 };
 
-// Nodo acción: perseguir al fantasma comestible más cercano
-class ChaseEdibleGhost : public Behavior {
-public:
-    virtual Status update() override;
-};
-
-// Nodo condición: ¿hay fantasmas no comestibles peligrosos cerca?
-class DangerousGhostNearby : public Behavior {
+// ¿Peligro INMEDIATO? (fantasma muy cerca)
+class ImmediateDanger : public Behavior {
 private:
-    float threatDistance;
+    float criticalDistance;
 public:
-    DangerousGhostNearby(float distance = 64.0f);
+    ImmediateDanger(float distance = 35.0f);
     virtual Status update() override;
 };
 
-class EvadeGhosts : public Behavior {
-public:
-    virtual Status update() override;
-};
-
-class NearbyFood : public Behavior {
-private:
-    float searchRadius;
-public:
-    NearbyFood(float radius = 80.0f);
-    virtual Status update() override;
-};
-
-// Nodo accion: moverse hacia la comida más cercana
-class CollectFood : public Behavior {
+// ¿Vale la pena ir por Power Pill? (peligro cercano + power pill accesible)
+class WorthGettingPowerPill : public Behavior {
 public:
     virtual Status update() override;
 };
 
-// Nodo accion por defecto: movimiento aleatorio
-class RandomExplore : public Behavior {
+// ¿Queda comida?
+class FoodRemaining : public Behavior {
+public:
+    virtual Status update() override;
+};
+
+// === ACCIONES ===
+
+// Perseguir fantasma comestible cercano
+class ChaseNearbyGhost : public Behavior {
+public:
+    virtual Status update() override;
+};
+
+// Huir urgentemente
+class EmergencyEvade : public Behavior {
+public:
+    virtual Status update() override;
+};
+
+// Ir por Power Pill estratégicamente
+class GetStrategicPowerPill : public Behavior {
+public:
+    virtual Status update() override;
+};
+
+// Recolectar comida (acción principal)
+class CollectNearestFood : public Behavior {
+public:
+    virtual Status update() override;
+};
+
+// Exploración con compromiso (anti-oscilación)
+class CommittedExplore : public Behavior {
 private:
     std::mt19937 rng;
-    std::uniform_int_distribution<int> dist;
 public:
-    RandomExplore();
+    CommittedExplore();
     virtual Status update() override;
 };
 
