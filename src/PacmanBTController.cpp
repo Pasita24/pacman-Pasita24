@@ -62,11 +62,6 @@ static int findNearestFood(const std::pair<int,int>& fromPos,
     return bestNode;
 }
 
-// ---------------------------------------------------------------------------
-// Calcula un "peligro fantasmal" desde un nodo destino.
-// Suma contribuciones de TODOS los fantasmas no-comestibles usando
-// un factor de decaimiento exponencial. A mayor distancia, menor peso.
-// ---------------------------------------------------------------------------
 static float ghostDangerAt(int destNode, const GameState* gs,
                             float decayRadius = 40.0f) {
     auto destPos = gs->getMaze().getNodePos(destNode);
@@ -84,11 +79,7 @@ static float ghostDangerAt(int destNode, const GameState* gs,
     return totalDanger;
 }
 
-// ---------------------------------------------------------------------------
-// Opuesto: recompensa para acción de HUIR — queremos maximizar esta
-// combinando la distancia al fantasma más cercano con un bonus por
-// alejarnos de TODOS los fantasmas a la vez.
-// ---------------------------------------------------------------------------
+
 static float fleeScoreAt(int destNode, const GameState* gs) {
     auto destPos = gs->getMaze().getNodePos(destNode);
     float minDist = std::numeric_limits<float>::max();
@@ -111,13 +102,6 @@ static float fleeScoreAt(int destNode, const GameState* gs) {
     return 0.6f * minDist + 0.4f * avgDist;
 }
 
-// ---------------------------------------------------------------------------
-// selectBestMove mejorado:
-//   - minimize=true  → acercarse al target (comida/fantasma comestible)
-//   - minimize=false → huir (usa fleeScoreAt en lugar de distancia al target)
-//   - En AMBOS casos penaliza callejones sin salida y nodos con peligro alto
-//   - Rompe el commitment si llegamos a una intersección (decisión consciente)
-// ---------------------------------------------------------------------------
 static Move selectBestMove(std::shared_ptr<Character> ch, const GameState* gs,
                            const std::pair<int,int>& target, bool minimize,
                            bool flee = false) {
@@ -413,10 +397,6 @@ Status ChaseNearbyGhost::update() {
     return BH_SUCCESS;
 }
 
-// ---------------------------------------------------------------------------
-// MultiGhostEvade: huye evaluando TODOS los fantasmas a la vez.
-// Usa fleeScoreAt() que pondera distancia mínima + distancia promedio,
-// evitando que Pacman corra hacia otro fantasma al huir del primero.
 // ---------------------------------------------------------------------------
 Status MultiGhostEvade::update() {
     auto character = PacmanInfo::getInfo()->in_character;
