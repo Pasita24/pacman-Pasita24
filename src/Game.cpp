@@ -24,6 +24,7 @@
 #include "PinkyBTController.h"
 #include "PacmanBTController.h"
 #include "PinkyFSMController.h"
+#include "ClydeFSMController.h"
 
 
 extern bool quick;
@@ -46,10 +47,10 @@ gv(std::make_unique<GameView>(std::vector<std::string>{"images/maze-a.png","imag
 		ghosts.push_back(ghost);
 	}
 	gameState.addGhosts(ghosts);
-	ghostsControl.push_back(std::make_shared<PinkyFSMController>(ghosts[0]));
-	ghostsControl.push_back(std::make_shared<DecisionTreeGhostController>(ghosts[1]));
-	ghostsControl.push_back(std::make_shared<PinkyBTController>(ghosts[2]));
-	ghostsControl.push_back(std::make_shared<DecisionTreeGhostController>(ghosts[3]));
+	ghostsControl.push_back(std::make_shared<ClydeFSMController>(ghosts[0]));
+	ghostsControl.push_back(std::make_shared<ClydeFSMController>(ghosts[1]));
+	ghostsControl.push_back(std::make_shared<ClydeFSMController>(ghosts[2]));
+	ghostsControl.push_back(std::make_shared<ClydeFSMController>(ghosts[3]));
 	//  ghostsControl.push_back(std::make_shared<BlinkyController>(ghosts[0]));
 	//  ghostsControl.push_back(std::make_shared<InkyController>(ghosts[1]));
 	//  ghostsControl.push_back(std::make_shared<PinkyController>(ghosts[2]));
